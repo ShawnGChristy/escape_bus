@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+<h1>Your Escape Bus!</h1>
+
+<h3 class="text-muted">Your current location</h3>
+<p>
+  <%= @location.full_street_address %>
+</p>
+
+
+  <h3>The closest buses are...</h3>
+<p>
+  <% @buses.each do |bus| %>
+  <strong>Route:</strong> <%= bus ["ROUTE"] %> <%= bus["DIRECTION"] %><br>
+  <strong>Bus number:</strong> <%= bus["VEHICLE"] %><br>
+  <strong>Next stop:</strong> <%= bus["TIMEPOINT"] %><br>
+  <br>
+  <% end %>
+  
+</p>
+
+<% if @buses.empty? %>
+  <p>
+      Not really that close :( Time to walk, bike, taxi, Uber or <%= link_to 'edit_your_location', edit_location_path(@location) %>
+  </p>
+  <% end %>
