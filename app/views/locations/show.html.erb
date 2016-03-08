@@ -1,6 +1,8 @@
 <p id="notice"><%= notice %></p>
 <h1>Your Escape Bus!</h1>
 
+ <div id="map"></div>
+
 <h3 class="text-muted">Your current location</h3>
 <p>
   <%= @location.full_street_address %>
@@ -23,3 +25,56 @@
       Not really that close :( Time to walk, bike, taxi, Uber or <%= link_to 'edit_your_location', edit_location_path(@location) %>
   </p>
   <% end %>
+  <script>
+      var map, mapOptions;
+      function initMap() {
+        var userLatLng = {
+          lat: <%= @location.latitude %>, 
+          lng: <%= @location.longitude %>
+          
+        };
+      var userIcon = "<%= image_path 'beachflag.png' %>"  
+        var nearbyBuses = <%= raw @buses.to_json %>;
+        
+        mapOptions = {
+          center: userLatLng,
+          zoom: 15
+        };
+        
+        
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        
+        var userMarker = new google.maps.Marker({
+          position: userLatLng, 
+          map: map, 
+          animation: google.maps.Animation.DROP,
+          title: 'You Are Here',
+          icon: userIcon
+        });
+        
+       nearbyBuses.forEach(function (element){
+        var busLatLng = new google.maps.LatLng(element['LATITUDE'], element['LONGITUDE']);
+        
+        var busMarker = new google.maps.Marker({
+          position: busLatLng,
+          map: map,
+          animation: google.maps.Animation.DROP,
+          title: element['ROUTE']
+        });
+        
+      var busInfo =
+       '<div id="content">' +
+         '<h2>Bus ' + element['ROUTE'] + ' ' + element['DIRECTION'] + '</h2>' +
+         '<div id="bodyContent">' +
+           '<p>Next stop: ' + element['TIMEPOINT'] + '</p>' +
+         '</div>' +
+       '</div>';
+        
+      var busWindow = new google.maps.InfoWindow({
+        content: busInfo
+      })
+
+      google.maps.event.addListener(busMarker, 'click', function(){
+        busWindow.open(map, busMarker)
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['google_maps_api_key'] %>&callback=initMap"
